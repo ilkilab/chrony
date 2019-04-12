@@ -1,0 +1,22 @@
+---
+# tasks file for chrony
+- name: Installation package chrony
+  apt:
+    name: chrony
+    state: latest
+    update_cache: yes
+- name: Gestion des fichiers de configuration
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dst }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  notify: restart chrony
+  loop:
+    - { src: "chrony.conf.j2", dst: "/etc/chrony/chrony.conf", mode: 0644 }
+- name: Lancement du service Chronyd et vérification lancement au démarrage
+  service:
+    enabled: yes
+    name: chrony
+    state: started

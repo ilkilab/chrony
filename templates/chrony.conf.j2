@@ -1,0 +1,53 @@
+#
+# {{ ansible_managed }}
+#
+
+#server pool.ntp.org prefer iburst
+{% if chrony_ntp_servers|length > 0 %}
+{% for host in chrony_ntp_servers %}
+server {{ host }} iburst
+{% endfor %}
+{% endif %}
+
+# Record the rate at which the system clock gains/losses time.
+{% if chrony_driftfile|length > 0 %}
+driftfile {{ chrony_driftfile }}
+{% endif %}
+# Allow the system clock to be stepped in the first three updates
+# if its offset is larger than 1 second.
+{% if chrony_makestep|length > 0 %}
+makestep {{ chrony_makestep }}
+{% endif %}
+# Enable kernel synchronization of the real-time clock (RTC).
+{% if chrony_rtcsync %}
+rtcsync
+{% endif %}
+
+# Enable hardware timestamping on all interfaces that support it.
+#hwtimestamp *
+
+# Increase the minimum number of selectable sources required to adjust
+# the system clock.
+#minsources 2
+
+# Allow NTP client access from local network.
+{% if chrony_allow|length > 0 %}
+{% for network in chrony_allow %}
+allow {{ network }}
+{% endfor %}
+{% endif %}
+
+# Serve time even if not synchronized to a time source.
+#local stratum 10
+
+# Specify file containing keys for NTP authentication.
+#keyfile /etc/chrony.keys
+
+# Specify directory for log files.
+{% if chrony_logdir|length > 0 %}
+logdir {{ chrony_logdir }}
+{% endif %}
+# Select which information is logged.
+{% if chrony_log %}
+log measurements statistics tracking
+{% endif %}
